@@ -30,11 +30,18 @@ app.factory('Auth', function ($http, $rootScope) {
 		});
 	};
 
-	Auth.logout = function() {
+	Auth.logout = function () {
 		return $http.delete('/logout')
 		.then(function() {
 			$rootScope.currentUser = null;
 		})
+	};
+
+	Auth.getCurrentUser = function () {
+		return $http.get('/me')
+		.then(function (response) {
+			return response.data;
+		});
 	};
 
 	return Auth;
