@@ -1,5 +1,5 @@
 <nav class="navbar navbar-default">
-	<div class="container" ng-controller="NavCtrl">
+	<div class="container">
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
 				<span class="icon-bar"></span>
@@ -15,9 +15,9 @@
 				<li ng-class="{active: pathStartsWithStatePath('stories')}"><a ui-sref="stories">stories</a></li>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
-				<li ui-sref-active="active"><a ui-sref="signup">signup</a></li>
-				<li ui-sref-active="active"><a ui-sref="login">login</a></li>
-				<li><button class="navbar-btn btn btn-default" ng-click="submitLogout()">logout</button></li>
+				<li ng-hide="currentUser" ui-sref-active="active"><a ui-sref="signup">signup</a></li>
+				<li ng-hide="currentUser" ui-sref-active="active"><a ui-sref="login">login</a></li>
+				<li><button ng-show="currentUser" class="navbar-btn btn btn-default" ng-click="submitLogout()">logout</button></li>
 			</ul>
 		</div>
 	</div>

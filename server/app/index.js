@@ -2,7 +2,7 @@
 
 var app = require('express')();
 var path = require('path');
-var User = require('../api/users/user.model');
+var mongoose = require('mongoose');
 
 app.use(require('./logging.middleware'));
 
@@ -21,26 +21,33 @@ app.use(function (req, res, next) {
     next();
 });
 
+app.use('/api', function(req, res, next) {
+    req.session.counter = req.session.counter || 0;
+    req.session.counter++;
+    next();
+});
+
 app.post('/login', function (req, res, next) {
-    User.findOne({
+    //find a user based on req.body
+    mongoose.model('User').findOne({
         email: req.body.email,
         password: req.body.password
     })
     .exec()
+    //persist user to session
     .then(function (user) {
         if (!user) {
             res.sendStatus(401);
         } else {
-        	console.log('In login route');
             req.session.userId = user._id;
-            res.sendStatus(200);
+            res.json(user);
         }
     })
     .then(null, next);
 });
 
 app.post('/signup', function (req, res, next) {
-    User.create({
+    mongoose.model('User').create({
         email: req.body.email,
         password: req.body.password
     })
@@ -48,27 +55,17 @@ app.post('/signup', function (req, res, next) {
         if (!user) {
             res.sendStatus(401);
         } else {
-        	console.log('In signup route');
             req.session.userId = user._id;
-            res.sendStatus(200);
+            res.status(201).json(user);
         }
     })
     .then(null, next);
 });
 
-app.get('/logout', function (req, res, next) {
-    User.findById(req.session.userId)
-    .exec()
-    .then(function (user) {
-        if (!user) {
-            res.sendStatus(401);
-        } else {
-        	console.log('In logout route');
-            req.session.userId = null;
-            res.sendStatus(200);
-        }
-    })
-    .then(null, next);
+app.delete('/logout', function (req, res, next) {
+
+    delete req.session.userId;
+    res.sendStatus(204);
 });
 
 app.use('/api', require('../api/api.router'));
